@@ -1,0 +1,26 @@
+{
+  "name": "webapp",
+  "version": "0.1.0",
+  "description": "Pipeline web app en 3 étapes (concevoir, construire + vidéo, revue du client) : volet de suivi, bande, décisions mot pour mot ; seule la session rattachée par /webapp <projet> est concernée",
+  "author": {
+    "name": "Anthony Hunt"
+  },
+  "license": "Apache-2.0",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "hote": {
+      "type": "string",
+      "title": "Hôte du programme webapp",
+      "description": "Hôte SSH du serveur des runs (utilisateur@machine), quand la session ne tourne pas sur ce serveur",
+      "default": "utilisateur@serveur-des-runs",
+      "required": false
+    },
+    "programme": {
+      "type": "string",
+      "title": "Chemin du programme webapp",
+      "description": "Chemin de mod/programme/webapp.py sur le serveur des runs",
+      "default": "/opt/webapp-pipeline/mod/programme/webapp.py",
+      "required": false
+    }
+  }
+}

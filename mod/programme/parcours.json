@@ -1,0 +1,139 @@
+{
+  "_role": "Parcours générique d'une run de la pipeline web app en 3 étapes (design : docs/2026-10-24-webapp-3-etapes-design.md). « qui » : moi (l'utilisateur, avec le client, décide), agent (l'agent travaille, l'utilisateur valide), programme (constaté par le programme, sans validation humaine). Les sorties sont relatives au workspace de la run.",
+  "regles_communes": [
+    "Une seule question par message ; toute question à choix est en A/B/C avec une option D « autre chose, précise-moi » écrite en clair parmi les autres.",
+    "Jamais de question technique pendant qu'on parle d'usage : note-la dans docs/pipeline/questions-techniques.md, la spécification la tranchera seule.",
+    "Ne pose pas une question dont la réponse se déduit du pitch ou d'une décision déjà prise : tranche et dis-le en une ligne.",
+    "Chaque choix de l'utilisateur s'enregistre avec l'outil `decision`, ses mots exacts en citation, sous sa sous-étape.",
+    "Une sous-étape « agent » se présente (outil `avancer`, etat « a_valider ») puis n'est validée (« validee ») que sur une réponse explicite de l'utilisateur, citée mot pour mot.",
+    "Réponses courtes : le résultat d'abord, en points, sans préambule ni conclusion qui répète.",
+    "Quand l'utilisateur demande de revenir sur une sous-étape (souvent depuis le volet), appelle l'outil `rouvrir` avec sa raison, et reprends-la.",
+    "Pas de squelette (skeleton) dans ce mode : le pitch et les questions d'usage se font en texte, la maquette d'E1.6 est le seul support visuel ; n'écris pas docs/pipeline/skeleton-url.txt, aucun contrôle ne le demande."
+  ],
+  "etapes": [
+    {
+      "n": 1,
+      "titre": "Concevoir",
+      "resume": "Du pitch à une maquette cliquable validée par le client, avec le cahier des charges, le parcours utilisateur et les user stories, puis la spécification complète en autonomie.",
+      "sous_etapes": [
+        {
+          "id": "E1.1",
+          "titre": "Le pitch",
+          "qui": "moi",
+          "sortie": [],
+          "consigne": "Le prochain message de l'utilisateur EST le pitch (le module le valide tout seul, mot pour mot). Ne demande jamais « que voulez-vous faire ? »."
+        },
+        {
+          "id": "E1.2",
+          "titre": "Les questions d'usage",
+          "qui": "agent",
+          "sortie": [
+            "docs/pipeline/concept.md"
+          ],
+          "consigne": "Quelques questions sur l'USAGE seulement (qui s'en sert, quand, pour quoi faire, ce qui compte le plus), une à la fois, au plus 5, chacune en A/B/C/D. Écris docs/pipeline/concept.md, résume-le en 3 à 5 points, passe en a_valider et demande A) oui c'est ça / B) je corrige / C) il manque quelque chose / D) autre chose, précise-moi."
+        },
+        {
+          "id": "E1.3",
+          "titre": "Le cahier des charges",
+          "qui": "agent",
+          "sortie": [
+            "docs/pipeline/cahier-des-charges.md"
+          ],
+          "consigne": "Écris docs/pipeline/cahier-des-charges.md : but de l'app, utilisateurs, périmètre V1, hors périmètre, contraintes, sources de données (vérifie en ligne qu'elles existent et répondent). Présente-le en points courts, passe en a_valider, demande la validation (A/B/C/D)."
+        },
+        {
+          "id": "E1.4",
+          "titre": "Le parcours utilisateur",
+          "qui": "agent",
+          "sortie": [
+            "docs/pipeline/parcours-utilisateur.json",
+            "docs/pipeline/parcours-utilisateur.md"
+          ],
+          "consigne": "Écris les parcours de bout en bout (un parcours = un usage complet, ex. « je fais un trajet Toulouse-Paris et je partage les frais »), au format du contrat (flux/docs/2026-10-24-webapp-3-etapes-contrat.md) : id, titre, qui, but, étapes numérotées avec écran et geste. Les écrans se nomment ici et se dessinent à E1.6. Présente chaque parcours en une phrase + ses étapes, passe en a_valider, demande la validation."
+        },
+        {
+          "id": "E1.5",
+          "titre": "Les user stories",
+          "qui": "agent",
+          "sortie": [
+            "docs/pipeline/design/stories-v1.json"
+          ],
+          "consigne": "Dérive les histoires du parcours : une par geste, chacune rattachée à son écran et à son élément cible, et chaque étape de parcours cite ses histoires (mets parcours-utilisateur.json à jour). Présente-les groupées par parcours, en une ligne chacune, passe en a_valider."
+        },
+        {
+          "id": "E1.6",
+          "titre": "La maquette",
+          "qui": "agent",
+          "sortie": [
+            "docs/pipeline/design/mockup.html",
+            "docs/pipeline/design/mockup-public-url.txt",
+            "docs/pipeline/design/screens.json"
+          ],
+          "consigne": "Construis la maquette cliquable avec son panneau d'histoires (format du nœud 1 du graphe : système de design en tokens, passe éditoriale artifact-design), publie-la en HTTP avec `$WEBAPP_PIPELINE_HOME/tools/publier-design.sh <workspace>` et écris l'adresse dans mockup-public-url.txt. Passe en a_valider et donne le lien à l'utilisateur pour le client, SANS question de validation : la maquette se valide par le test (E1.7). Le message suivant de l'utilisateur (première remarque du client ou « c'est bon ») vaut validation de E1.6 : valide-la avec ces mots en citation, puis traite ce message sous E1.7."
+        },
+        {
+          "id": "E1.7",
+          "titre": "Le test de la maquette",
+          "qui": "moi",
+          "sortie": [
+            "docs/pipeline/design/validation.md"
+          ],
+          "consigne": "Le client parcourt la maquette. Chaque remarque se corrige en direct et se republie aussitôt (même lien), une remarque à la fois. Tiens docs/pipeline/design/validation.md (remarques mot pour mot + ce qui a changé). La sous-étape se valide sur le « c'est bon » explicite de l'utilisateur, cité mot pour mot : sur ce « c'est bon », ne redemande rien, passe E1.7 en a_valider puis validee avec cette citation et enchaîne la spécification (E1.8)."
+        },
+        {
+          "id": "E1.8",
+          "titre": "La spécification",
+          "qui": "programme",
+          "sortie": [
+            "docs/pipeline/stories.json",
+            "docs/pipeline/roadmap-approved.json",
+            "docs/pipeline/stack-decisions.md"
+          ],
+          "consigne": "Sans aucune question : complète les histoires, décide la pile (standard), écris la feuille de route (un jalon = un groupe d'écrans de la maquette), le kit de projet et les tests, contrôle le pré-vol — tout ce que demandent les consignes du nœud 1 après le test. Quand c'est fini, appelle `cloturer` : le programme passe le contrôle de l'étape (gate) ; s'il est rouge, corrige ce qu'il dit et rappelle `cloturer`."
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "titre": "Construire",
+      "resume": "L'app se construit seule sur le serveur, un groupe d'écrans à la fois (un agent construit, un vérificateur indépendant rejoue les histoires), puis la vidéo de démonstration se tourne et se publie.",
+      "sous_etapes": [
+        {
+          "id": "E2.1",
+          "titre": "La construction",
+          "qui": "programme",
+          "sortie": [
+            "docs/pipeline/app-url.txt"
+          ],
+          "consigne": "Lancée par le bouton du volet ou l'outil `lancer`. Rien à faire en conversation : le volet suit l'avancement."
+        },
+        {
+          "id": "E2.2",
+          "titre": "La vidéo",
+          "qui": "programme",
+          "sortie": [
+            "video/video-url.txt",
+            "video/versions.json"
+          ],
+          "consigne": "Tournée automatiquement en fin de construction, à partir du parcours utilisateur et des histoires."
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "titre": "Revue",
+      "resume": "Le client regarde la vidéo et teste l'app. « Good » clôt la run ; sinon ses retours relancent la construction sur ces seuls points, et la vidéo passe à la version suivante.",
+      "sous_etapes": [
+        {
+          "id": "E3.1",
+          "titre": "La revue du client",
+          "qui": "moi",
+          "sortie": [
+            "docs/pipeline/revue.json"
+          ],
+          "consigne": "Donne les deux liens (vidéo, app). L'utilisateur rapporte ce que dit le client. S'il dit que c'est bon : outil `revue` verdict good, citation mot pour mot. Sinon : reprends chaque retour un par un (une question à la fois si un retour est ambigu : quel écran, quel résultat attendu), puis outil `retours` avec la liste (dit = ses mots exacts, attendu = un critère vérifiable), puis outil `revue` verdict retours : la construction repart toute seule sur ces points."
+        }
+      ]
+    }
+  ]
+}

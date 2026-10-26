@@ -1,0 +1,425 @@
+{
+  "$schema": "../runtime/workflow.schema.json",
+  "id": "webapp",
+  "name": "Web app — concevoir, construire, revoir",
+  "description": "Pipeline de construction d'application web en 3 nœuds. Le premier est INTERACTIF : conception avec le client, du pitch au mockup testé et au kit vérifié. Le deuxième est AUTONOME sur le serveur : construction jalon par jalon (bâtisseur puis vérificateur indépendant), puis vidéo de démonstration. Le troisième est la revue du client : « good » clôt la run, des retours relancent la construction sur ces seuls points. Chaque nœud a son gate : un contrôle qui juge ses livrables. Le graphe EST la vérité exécutable.",
+  "workspace_root": "~/webapp-runs",
+  "nodes": [
+    {
+      "id": "concevoir",
+      "n": 1,
+      "type": "local",
+      "name": "Concevoir",
+      "modele": "opus",
+      "entree": [],
+      "objectif": "Une seule session de conversation, du pitch au kit de projet vérifié : cadrer l'usage avec le client, écrire le cahier des charges et les parcours utilisateur, en dériver les histoires, dessiner le mockup et le faire tester au client, puis spécifier et contrôler le pré-vol en autonomie. Le découpage interne (cadrage → cahier des charges → parcours → histoires → mockup → test du client → spécification → pré-vol) ne coupe pas la conversation : rien ne se rapatrie ni ne se renvoie entre ces moments.",
+      "consignes": [
+        "pipeline-step1",
+        "pipeline-step2",
+        "pipeline-step3"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "TodoWrite",
+        "Artifact",
+        "WebSearch",
+        "WebFetch",
+        "Skill"
+      ],
+      "taches": [
+        "Cadrer l'usage en questions A/B/C sur un squelette vivant — jamais la construction",
+        "Écrire le cahier des charges et le faire valider",
+        "Écrire les parcours utilisateur de bout en bout et les faire valider",
+        "Poser le système de design du projet en tokens, seul",
+        "Dériver les histoires v1 du parcours, une par geste, avec leur écran et leur élément cible",
+        "Construire le mockup dual-layer en passe éditoriale et le publier",
+        "FAIRE TESTER le mockup au client et corriger en direct — seule barrière humaine de l'étape",
+        "Appliquer la pile STANDARD et documenter son application à ce projet",
+        "Compléter les histoires et établir la couverture UI totale",
+        "Produire architecture, feuille de route, kit de projet et tests",
+        "Contrôler le pré-vol : jalons démontrables, parcours couverts, cas d'usage, dépôt, déploiement"
+      ],
+      "taches_detail": [
+        {
+          "titre": "Cadrer l'usage en questions A/B/C sur un squelette vivant — jamais la construction",
+          "par": "l'agent, en dialogue A/B/C",
+          "detail": "Le premier message de l'opérateur EST le pitch. Chaque question propose trois réponses plausibles PLUS une quatrième option ouverte ÉCRITE ET VISIBLE (« Autre chose — précise-moi ») : quand la question passe par un widget de choix, cette option s'énumère comme les autres, jamais reléguée au champ « Other » implicite du widget ; toute question portant sur du VISIBLE se pose en dessin dans le squelette republié à chaque réponse. Les questions de construction partent en différé dans `questions-techniques.md`."
+        },
+        {
+          "titre": "Écrire le cahier des charges et le faire valider",
+          "par": "l'agent, puis toi",
+          "detail": "`docs/pipeline/cahier-des-charges.md` : but de l'app, utilisateurs, périmètre V1, hors périmètre, contraintes, sources de données — chaque source vérifiée en ligne (elle existe, elle répond). Présenté en points courts, validé sur une réponse explicite."
+        },
+        {
+          "titre": "Écrire les parcours utilisateur de bout en bout et les faire valider",
+          "par": "l'agent, puis toi",
+          "detail": "`parcours-utilisateur.json` au format du contrat (un parcours = un usage complet : id, titre, qui, but, étapes numérotées avec l'écran et le geste) + `parcours-utilisateur.md`, sa lecture humaine. Écrit AVANT les histoires et le mockup : les histoires en découlent, les écrans nommés ici se dessinent au mockup."
+        },
+        {
+          "titre": "Poser le système de design du projet en tokens, seul",
+          "par": "l'agent",
+          "detail": "`/design-sync` si un dépôt existe, sinon l'agent décide la direction et la fige en `tokens.json` (couleurs par rôle, échelles) + `design-system-spec.json`. Une ambiance décrite en prose se perd au premier écran."
+        },
+        {
+          "titre": "Dériver les histoires v1 du parcours, une par geste, avec leur écran et leur élément cible",
+          "par": "l'agent",
+          "detail": "`stories-v1.json` : chaque geste d'une étape de parcours devient une histoire, avec son `screen` et son `target` (clé `data-el`). Chaque étape de parcours cite ses histoires dans `parcours-utilisateur.json` — une étape sans histoire n'est ni construite ni filmée."
+        },
+        {
+          "titre": "Construire le mockup dual-layer en passe éditoriale et le publier",
+          "par": "l'agent",
+          "detail": "Un seul Artifact : prototype cliquable (thème du projet, passe éditoriale `artifact-design` — motif tiré du sujet, jamais le squelette redessiné) + panneau de stories en style pipeline neutre qui navigue et surligne au clic. Publie-le AUSSI en HTTP — `$WEBAPP_PIPELINE_HOME/tools/publier-design.sh <workspace>`, qui marche depuis toute machine qui écrit dans `DESIGN_PUBLISH_DIR` — et note l'adresse rendue dans `docs/pipeline/design/mockup-public-url.txt`. Un artifact appartient au compte qui l'a publié et reste privé : la personne qui teste n'a pas forcément ce compte, et le test est la seule barrière humaine de l'étape — il ne peut pas dépendre d'un identifiant. Le panneau d'histoires peut les grouper par parcours."
+        },
+        {
+          "titre": "FAIRE TESTER le mockup au client et corriger en direct — seule barrière humaine de l'étape",
+          "par": "le client avec toi, puis l'agent",
+          "detail": "Le client parcourt écran par écran, tu rapportes ses remarques, on corrige et on republie au même lien dans la foulée. Autant de tours que nécessaire. `validation.md` daté clôt le passage — postérieur au mockup ET aux histoires."
+        },
+        {
+          "titre": "Appliquer la pile STANDARD et documenter son application à ce projet",
+          "par": "l'agent, sans dialogue",
+          "detail": "La pile ne se rechoisit pas : **React + Vite (TS), Supabase (Postgres/Auth/Storage/RLS), Vercel, Vitest + Playwright**. `stack-decisions.md` documente COMMENT ce standard s'applique ici — schéma de données, tables et politiques RLS, buckets, ce qui est déployé où — et les ÉCARTS éventuels, chacun avec le fait d'usage qui l'impose (un écart ne se justifie que si le standard rend le produit impossible, jamais par préférence). Les questions différées au cadrage que le standard ne tranche pas reçoivent leur réponse dans le même fichier."
+        },
+        {
+          "titre": "Compléter les histoires et établir la couverture UI totale",
+          "par": "l'agent",
+          "detail": "Cas limites, paires, accessibilité, critères ÉTANT DONNÉ/QUAND/ALORS. Aucune histoire v1 ne disparaît. `ui-coverage.json` : chaque élément dessiné est raconté. Chaque histoire citée par un parcours existe dans `stories.json`."
+        },
+        {
+          "titre": "Produire architecture, feuille de route, kit de projet et tests",
+          "par": "l'agent",
+          "detail": "`system-architecture.html`, `roadmap.html` (3-6 jalons tous démontrables), spec/plan/tasks/rules, plans de cas d'usage et échafaudage Playwright."
+        },
+        {
+          "titre": "Contrôler le pré-vol : jalons démontrables, parcours couverts, cas d'usage, dépôt, déploiement",
+          "par": "l'agent",
+          "detail": "Contrôle sur pièces et CORRECTION : un jalon non démontrable fusionne (motif écrit), un plan de cas d'usage manquant s'écrit, une étape de parcours sans écran ou sans histoire se complète. `roadmap-approved.json` acte le pré-vol."
+        }
+      ],
+      "livrables": [
+        "docs/pipeline/concept.md",
+        "docs/pipeline/questions-techniques.md",
+        "docs/pipeline/cahier-des-charges.md",
+        "docs/pipeline/parcours-utilisateur.json",
+        "docs/pipeline/parcours-utilisateur.md",
+        "docs/pipeline/design/mockup-url.txt",
+        "docs/pipeline/design/mockup-public-url.txt",
+        "docs/pipeline/design/screens.json",
+        "docs/pipeline/design/stories-v1.json",
+        "docs/pipeline/design/validation.md",
+        "docs/pipeline/stack-decisions.md",
+        "docs/pipeline/stories.json",
+        "docs/pipeline/ui-coverage.json",
+        "docs/pipeline/roadmap.html",
+        "docs/pipeline/spec.md",
+        "docs/pipeline/plan.md",
+        "docs/pipeline/tasks.md",
+        "docs/pipeline/rules.md",
+        "docs/pipeline/roadmap-approved.json"
+      ],
+      "juge": {
+        "type": "presence"
+      },
+      "gate": {
+        "validateur": "webapp-concevoir"
+      },
+      "suivant": [
+        "construire"
+      ],
+      "commande_locale": "/webapp-start   (ou : flux-local webapp concevoir, puis --push)",
+      "note_locale": "Étape INTERACTIVE : elle se joue d'une traite dans une session Claude Code ouverte, avec le client — cadrage, cahier des charges, parcours, histoires, mockup, son test, puis spécification et pré-vol en autonomie. Le flux ne la lance pas. Point d'entrée d'une session neuve : le skill **`/webapp-start`**, qui résout la run, rapatrie le workspace et charge le brief. En direct : `flux-local webapp concevoir` puis `--push`.",
+      "agents": [
+        {
+          "role": "Le concepteur",
+          "competence": "mène la conception en conversation avec le client, dessine, puis spécifie seul jusqu'au kit vérifié",
+          "outils": [
+            "dialogue avec l'opérateur — A/B/C + quatrième option ouverte toujours ÉCRITE parmi les choix, une question à la fois, jamais à blanc",
+            "squelette et mockup publiés — Artifact (republiés au même chemin, donc même URL)",
+            "lecture-écriture du workspace — Read/Write/Edit/Glob/Grep",
+            "recherche en ligne — WebSearch/WebFetch (contraintes réelles avant de trancher la pile)",
+            "shell / terminal — Bash (arborescence, dépôt distant, pré-vol)"
+          ],
+          "consignes": [
+            {
+              "nom": "webapp-start",
+              "role": "le point d'entrée : run résolue, workspace rapatrié, brief et protocoles chargés"
+            },
+            {
+              "nom": "pipeline-step1",
+              "role": "cadrage, cahier des charges, parcours utilisateur, histoires v1, mockup dual-layer, test du client"
+            },
+            {
+              "nom": "pipeline-step2",
+              "role": "pile appliquée, histoires complétées depuis le parcours, couverture UI, kit de projet, tests"
+            },
+            {
+              "nom": "pipeline-step3",
+              "role": "pré-vol : kit vérifié, parcours couverts, jalons démontrables, dépôt, déploiement"
+            }
+          ],
+          "contexte": "~180k"
+        }
+      ],
+      "banderole": "FIN DE L'ÉTAPE 1 — CONCEVOIR"
+    },
+    {
+      "id": "construire",
+      "n": 2,
+      "type": "agent",
+      "name": "Construire",
+      "modele": "opus",
+      "entree": [
+        "docs/pipeline/concept.md",
+        "docs/pipeline/cahier-des-charges.md",
+        "docs/pipeline/parcours-utilisateur.json",
+        "docs/pipeline/design/mockup-url.txt",
+        "docs/pipeline/design/screens.json",
+        "docs/pipeline/design/validation.md",
+        "docs/pipeline/stack-decisions.md",
+        "docs/pipeline/stories.json",
+        "docs/pipeline/ui-coverage.json",
+        "docs/pipeline/spec.md",
+        "docs/pipeline/plan.md",
+        "docs/pipeline/tasks.md",
+        "docs/pipeline/rules.md",
+        "docs/pipeline/roadmap-approved.json"
+      ],
+      "objectif": "Construire l'application jalon par jalon — un jalon = un groupe d'écrans du mockup validé — selon le cycle bâtisseur → vérificateur indépendant → tests, commit, déploiement ; puis tourner la vidéo de démonstration depuis les parcours. Le nœud est relancé par `webapp-lancer` tant que son contrôle n'est pas vert : chaque lancement traite un jalon, ou le tournage. Après une revue à retours, il repart en mode retours sur le seul tour à traiter.",
+      "consignes": [
+        "pipeline-step4",
+        "pipeline-step4.1",
+        "pipeline-step4.2",
+        "pipeline-step4.3",
+        "pipeline-step4.4",
+        "pipeline-step4.5"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "TodoWrite",
+        "Task",
+        "WebFetch"
+      ],
+      "taches": [
+        "Lire l'avancement et choisir le mode : construction ou retours",
+        "Reprendre le jalon courant et ouvrir son journal",
+        "Bâtir le jalon (bâtisseur)",
+        "Rejouer les histoires du jalon sur l'app déployée (vérificateur indépendant)",
+        "Boucler jusqu'au PASS du vérificateur",
+        "Tests, commit, déploiement en production",
+        "Cocher le jalon et tenir l'avancement",
+        "Tourner la vidéo une fois tous les jalons faits",
+        "En mode retours : corriger le tour, refilmer les séquences touchées, figer la version suivante"
+      ],
+      "taches_detail": [
+        {
+          "titre": "Lire l'avancement et choisir le mode : construction ou retours",
+          "par": "l'agent",
+          "detail": "Un tour `docs/pipeline/retours/tour-<N>.json` au statut `a-traiter` → mode retours sur le plus ancien. Sinon, un jalon non fait → construction de ce jalon. Sinon, tous faits sans vidéo → tournage. L'état vit dans `status.md` et `avancement.json`, jamais dans la mémoire d'un agent."
+        },
+        {
+          "titre": "Reprendre le jalon courant et ouvrir son journal",
+          "par": "l'agent",
+          "detail": "Un lancement traite UN jalon : le premier non coché de `roadmap-approved.json`. `docs/pipeline/m{N}-journal.md` porte sa chronologie. Le chef n'écrit JAMAIS de code : il dispatche, route l'information, tient le journal et l'avancement."
+        },
+        {
+          "titre": "Bâtir le jalon (bâtisseur)",
+          "par": "sous-agent bâtisseur",
+          "detail": "Construit les histoires des écrans du jalon, déploie en préversion, parcourt l'app dans un vrai navigateur et rapporte ce qu'il a VU."
+        },
+        {
+          "titre": "Rejouer les histoires du jalon sur l'app déployée (vérificateur indépendant)",
+          "par": "sous-agent vérificateur",
+          "detail": "Agent frais qui n'a rien construit : il rejoue chaque histoire du jalon et chaque étape de parcours qui traverse ses écrans, sur l'URL déployée, capture chaque étape dans `tests/e2e/verification/m{N}/` et rend PASS ou FAIL avec la liste des écarts."
+        },
+        {
+          "titre": "Boucler jusqu'au PASS du vérificateur",
+          "par": "l'agent",
+          "detail": "FAIL → le bâtisseur repart avec la liste des écarts, puis un vérificateur FRAIS rejoue. Trois cycles au plus ; au-delà, le jalon reste ouvert et le blocage s'écrit dans `status.md`."
+        },
+        {
+          "titre": "Tests, commit, déploiement en production",
+          "par": "l'agent ou un sous-agent",
+          "detail": "Régression complète (Vitest + Playwright), commit, mise en production, contrôle HTTP de l'URL. L'URL de production s'écrit dans `docs/pipeline/app-url.txt`."
+        },
+        {
+          "titre": "Cocher le jalon et tenir l'avancement",
+          "par": "l'agent",
+          "detail": "`status.md` coche le jalon, `avancement.json` passe le jalon à `fait` et porte le suivant, `project-memory.md` est réécrit (≤ 2000 car). Un jalon coché sans journal ni PASS du vérificateur est refusé par le contrôle."
+        },
+        {
+          "titre": "Tourner la vidéo une fois tous les jalons faits",
+          "par": "l'agent",
+          "detail": "`python3 $WEBAPP_PIPELINE_HOME/tools/webapp-tourner.py <workspace>` : une séquence par parcours, filmée sur l'app en ligne, version V1 figée, table de montage publiée. `avancement.json` passe en `tournage` puis `fini`."
+        },
+        {
+          "titre": "En mode retours : corriger le tour, refilmer les séquences touchées, figer la version suivante",
+          "par": "l'agent et ses sous-agents",
+          "detail": "Chaque retour est corrigé puis son `attendu` vérifié sur l'app redéployée par un vérificateur frais. Ne se refilment que les séquences dont un parcours traverse un écran ou une histoire touchés (`webapp-tourner.py <ws> --tour N --sequences …`). Le tour passe à `traite`."
+        }
+      ],
+      "livrables": [
+        "docs/pipeline/status.md",
+        "docs/pipeline/avancement.json",
+        "docs/pipeline/app-url.txt",
+        "video/video-url.txt",
+        "video/versions.json"
+      ],
+      "juge": {
+        "type": "presence"
+      },
+      "gate": {
+        "validateur": "webapp-construire"
+      },
+      "suivant": [
+        "revue"
+      ],
+      "rapport_de_passe": {
+        "chiffres": [
+          "mode: construction, tournage ou retours (tour N)",
+          "jalon: le jalon traité cette passe et son statut en fin de passe",
+          "cycles: cycles bâtisseur → vérificateur joués",
+          "verificateur: verdict final, histoires rejouées / histoires du jalon",
+          "video: version figée et séquences filmées, ou —"
+        ],
+        "a_dire": [
+          "Ce que le vérificateur a refusé et comment le bâtisseur l'a corrigé",
+          "L'URL de production et ce qui y a été contrôlé",
+          "Ce qui reste à faire au prochain lancement"
+        ]
+      },
+      "agents": [
+        {
+          "role": "Le chef d'équipe",
+          "competence": "orchestre le cycle du jalon et le tournage sans jamais écrire une ligne de code",
+          "outils": [
+            "équipes d'agents — Task (bâtisseur, vérificateur)",
+            "shell / terminal — Bash (tests, commit, déploiement, tournage)",
+            "lecture-écriture des fichiers d'état — Read/Write/Edit"
+          ],
+          "consignes": [
+            {
+              "nom": "pipeline-step4",
+              "role": "le cycle par jalon, le choix du mode, l'avancement, les règles du chef"
+            },
+            {
+              "nom": "pipeline-step4.1",
+              "role": "le bâtisseur — construction et exploration de l'app réelle"
+            },
+            {
+              "nom": "pipeline-step4.2",
+              "role": "le vérificateur indépendant — rejoue les histoires sur l'app déployée"
+            },
+            {
+              "nom": "pipeline-step4.3",
+              "role": "le mode retours — traiter un tour de revue"
+            },
+            {
+              "nom": "pipeline-step4.4",
+              "role": "tests, commit, déploiement"
+            },
+            {
+              "nom": "pipeline-step4.5",
+              "role": "le tournage de la vidéo et ses versions"
+            }
+          ],
+          "contexte": "~150k"
+        }
+      ],
+      "note_locale": "Étape autonome : elle tourne sur le serveur, sans toi. `python3 $WEBAPP_PIPELINE_HOME/tools/webapp-lancer.py <workspace>` la lance et la relance jusqu'au contrôle vert ; `webapp-etat.py <workspace>` dit où elle en est."
+    },
+    {
+      "id": "revue",
+      "n": 3,
+      "type": "local",
+      "name": "Revue",
+      "modele": "opus",
+      "entree": [
+        "docs/pipeline/app-url.txt",
+        "video/video-url.txt",
+        "video/versions.json"
+      ],
+      "objectif": "Le client regarde la vidéo et teste l'app avec toi. « Good » clôt la run ; sinon ses retours, rapportés par toi en conversation, deviennent un tour de points vérifiables et la construction repart sur ces seuls points. C'est la barrière humaine de fin : le flux ne la lance pas, elle se joue en conversation.",
+      "consignes": [
+        "pipeline-revue"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "TodoWrite"
+      ],
+      "taches": [
+        "Donner au client les deux liens : la vidéo et l'app",
+        "Recueillir le verdict, mot pour mot",
+        "Transformer chaque retour en un point vérifiable, une question à la fois",
+        "Écrire le tour, puis relancer la construction ou clore la run"
+      ],
+      "taches_detail": [
+        {
+          "titre": "Donner au client les deux liens : la vidéo et l'app",
+          "par": "l'agent",
+          "detail": "`video/video-url.txt` (la table de montage, version courante) et `docs/pipeline/app-url.txt`. Le client regarde et teste avec toi."
+        },
+        {
+          "titre": "Recueillir le verdict, mot pour mot",
+          "par": "toi, puis l'agent",
+          "detail": "« Good » (c'est bon) ou des retours. La citation exacte de tes mots part dans `revue.json` — jamais une reformulation."
+        },
+        {
+          "titre": "Transformer chaque retour en un point vérifiable, une question à la fois",
+          "par": "l'agent, en dialogue",
+          "detail": "Chaque retour : ce qui a été dit (mots exacts), l'histoire et l'écran touchés quand ils se déduisent, et un `attendu` vérifiable sur l'app. Un retour ambigu se lève par UNE question A/B/C/D, jamais plusieurs."
+        },
+        {
+          "titre": "Écrire le tour, puis relancer la construction ou clore la run",
+          "par": "l'agent",
+          "detail": "Verdict `retours` : `retours/tour-<N>.json` + `.md` au statut `a-traiter`, puis `python3 $WEBAPP_PIPELINE_HOME/tools/webapp-lancer.py <workspace>` relance la construction sur ces seuls points. Verdict `good` : la run est close."
+        }
+      ],
+      "livrables": [
+        "docs/pipeline/revue.json"
+      ],
+      "juge": {
+        "type": "presence"
+      },
+      "gate": {
+        "validateur": "webapp-revue"
+      },
+      "suivant": [],
+      "commande_locale": "/webapp-start   (la run est à la revue ; ou : flux-local webapp revue, puis --push)",
+      "note_locale": "Étape INTERACTIVE : le client regarde la vidéo et teste l'app, ses retours passent par toi en conversation. Un verdict à retours relance `construire` par `webapp-lancer.py` — la boucle revue → construire est portée par cette commande, pas par le graphe, dont la barrière d'entrée exigerait sinon une revue avant la première construction.",
+      "agents": [
+        {
+          "role": "Le greffier de la revue",
+          "competence": "transforme les mots du client en points vérifiables sans jamais les reformuler à sa place",
+          "outils": [
+            "dialogue avec l'opérateur — une question à la fois, A/B/C + option ouverte écrite",
+            "lecture-écriture de la revue — Read/Write/Edit",
+            "shell / terminal — Bash (relancer la construction par webapp-lancer)"
+          ],
+          "consignes": [
+            {
+              "nom": "pipeline-revue",
+              "role": "le protocole de la revue : verdict, retours vérifiables, tour, relance"
+            }
+          ],
+          "contexte": "~60k"
+        }
+      ],
+      "banderole": "FIN DE LA REVUE"
+    }
+  ]
+}
