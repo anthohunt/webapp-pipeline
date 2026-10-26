@@ -114,9 +114,16 @@ class Base(unittest.TestCase):
     def setUp(self):
         self.ws = pathlib.Path(tempfile.mkdtemp(prefix='webapp3-'))
         fabriquer(self.ws)
+        # La vidéo est demandée par défaut ; un .env chargé (WEBAPP_VIDEO=0) ne doit pas changer les contrôles testés.
+        self.video_avant = os.environ.get('WEBAPP_VIDEO')
+        os.environ['WEBAPP_VIDEO'] = '1'
 
     def tearDown(self):
         shutil.rmtree(self.ws, ignore_errors=True)
+        if self.video_avant is None:
+            os.environ.pop('WEBAPP_VIDEO', None)
+        else:
+            os.environ['WEBAPP_VIDEO'] = self.video_avant
 
     def refuse(self, mod, code, motif=''):
         errs = mod.validate(str(self.ws))
@@ -255,10 +262,7 @@ class MutationsConstruire(Base):
     def test_sans_outil_de_tournage_la_video_nest_pas_demandee(self):
         shutil.rmtree(self.ws / 'video')
         os.environ['WEBAPP_VIDEO'] = '0'
-        try:
-            self.assertEqual(CONSTRUIRE.validate(str(self.ws)), [])
-        finally:
-            os.environ.pop('WEBAPP_VIDEO')
+        self.assertEqual(CONSTRUIRE.validate(str(self.ws)), [])
 
     def test_versions_manquantes(self):
         (self.ws / 'video/versions.json').unlink()
@@ -311,10 +315,7 @@ class MutationsRevue(Base):
     def test_revue_sans_video_permise_sans_outil_de_tournage(self):
         (self.ws / 'video/versions.json').unlink()
         os.environ['WEBAPP_VIDEO'] = '0'
-        try:
-            self.assertFalse([e for e in REVUE.validate(str(self.ws)) if e.startswith('C2')])
-        finally:
-            os.environ.pop('WEBAPP_VIDEO')
+        self.assertFalse([e for e in REVUE.validate(str(self.ws)) if e.startswith('C2')])
 
     def test_good_suivi_dun_autre_tour(self):
         ajouter_tour_retours(self.ws)
