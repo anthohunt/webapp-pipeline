@@ -1,0 +1,8 @@
+.env
+vendor/
+__pycache__/
+*.pyc
+*.bak*
+node_modules/
+mod/.claude-plugin/types/
+state/

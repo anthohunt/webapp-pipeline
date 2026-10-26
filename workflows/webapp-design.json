@@ -1,0 +1,169 @@
+{
+  "$schema": "../runtime/workflow.schema.json",
+  "id": "webapp-design",
+  "name": "Design web app — concevoir avec le client, dessiner, spécifier",
+  "description": "Le nœud interactif de la pipeline web app, joué seul et sur ses propres runs. Du pitch au mockup testé et au kit de projet vérifié, en une session de conversation.",
+  "workspace_root": "~/webapp-design-runs",
+  "nodes": [
+    {
+      "id": "concevoir",
+      "n": 1,
+      "type": "local",
+      "name": "Concevoir",
+      "modele": "opus",
+      "entree": [],
+      "objectif": "Une seule session de conversation, du pitch au kit de projet vérifié : cadrer l'usage avec le client, écrire le cahier des charges et les parcours utilisateur, en dériver les histoires, dessiner le mockup et le faire tester au client, puis spécifier et contrôler le pré-vol en autonomie. Le découpage interne (cadrage → cahier des charges → parcours → histoires → mockup → test du client → spécification → pré-vol) ne coupe pas la conversation : rien ne se rapatrie ni ne se renvoie entre ces moments.",
+      "consignes": [
+        "pipeline-step1",
+        "pipeline-step2",
+        "pipeline-step3"
+      ],
+      "tools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "TodoWrite",
+        "Artifact",
+        "WebSearch",
+        "WebFetch",
+        "Skill"
+      ],
+      "taches": [
+        "Cadrer l'usage en questions A/B/C sur un squelette vivant — jamais la construction",
+        "Écrire le cahier des charges et le faire valider",
+        "Écrire les parcours utilisateur de bout en bout et les faire valider",
+        "Poser le système de design du projet en tokens, seul",
+        "Dériver les histoires v1 du parcours, une par geste, avec leur écran et leur élément cible",
+        "Construire le mockup dual-layer en passe éditoriale et le publier",
+        "FAIRE TESTER le mockup au client et corriger en direct — seule barrière humaine de l'étape",
+        "Appliquer la pile STANDARD et documenter son application à ce projet",
+        "Compléter les histoires et établir la couverture UI totale",
+        "Produire architecture, feuille de route, kit de projet et tests",
+        "Contrôler le pré-vol : jalons démontrables, parcours couverts, cas d'usage, dépôt, déploiement"
+      ],
+      "taches_detail": [
+        {
+          "titre": "Cadrer l'usage en questions A/B/C sur un squelette vivant — jamais la construction",
+          "par": "l'agent, en dialogue A/B/C",
+          "detail": "Le premier message de l'opérateur EST le pitch. Chaque question propose trois réponses plausibles PLUS une quatrième option ouverte ÉCRITE ET VISIBLE (« Autre chose — précise-moi ») : quand la question passe par un widget de choix, cette option s'énumère comme les autres, jamais reléguée au champ « Other » implicite du widget ; toute question portant sur du VISIBLE se pose en dessin dans le squelette republié à chaque réponse. Les questions de construction partent en différé dans `questions-techniques.md`."
+        },
+        {
+          "titre": "Écrire le cahier des charges et le faire valider",
+          "par": "l'agent, puis toi",
+          "detail": "`docs/pipeline/cahier-des-charges.md` : but de l'app, utilisateurs, périmètre V1, hors périmètre, contraintes, sources de données — chaque source vérifiée en ligne (elle existe, elle répond). Présenté en points courts, validé sur une réponse explicite."
+        },
+        {
+          "titre": "Écrire les parcours utilisateur de bout en bout et les faire valider",
+          "par": "l'agent, puis toi",
+          "detail": "`parcours-utilisateur.json` au format du contrat (un parcours = un usage complet : id, titre, qui, but, étapes numérotées avec l'écran et le geste) + `parcours-utilisateur.md`, sa lecture humaine. Écrit AVANT les histoires et le mockup : les histoires en découlent, les écrans nommés ici se dessinent au mockup."
+        },
+        {
+          "titre": "Poser le système de design du projet en tokens, seul",
+          "par": "l'agent",
+          "detail": "`/design-sync` si un dépôt existe, sinon l'agent décide la direction et la fige en `tokens.json` (couleurs par rôle, échelles) + `design-system-spec.json`. Une ambiance décrite en prose se perd au premier écran."
+        },
+        {
+          "titre": "Dériver les histoires v1 du parcours, une par geste, avec leur écran et leur élément cible",
+          "par": "l'agent",
+          "detail": "`stories-v1.json` : chaque geste d'une étape de parcours devient une histoire, avec son `screen` et son `target` (clé `data-el`). Chaque étape de parcours cite ses histoires dans `parcours-utilisateur.json` — une étape sans histoire n'est ni construite ni filmée."
+        },
+        {
+          "titre": "Construire le mockup dual-layer en passe éditoriale et le publier",
+          "par": "l'agent",
+          "detail": "Un seul Artifact : prototype cliquable (thème du projet, passe éditoriale `artifact-design` — motif tiré du sujet, jamais le squelette redessiné) + panneau de stories en style pipeline neutre qui navigue et surligne au clic. Publie-le AUSSI en HTTP — `$WEBAPP_PIPELINE_HOME/tools/publier-design.sh <workspace>`, qui marche depuis toute machine qui écrit dans `DESIGN_PUBLISH_DIR` — et note l'adresse rendue dans `docs/pipeline/design/mockup-public-url.txt`. Un artifact appartient au compte qui l'a publié et reste privé : la personne qui teste n'a pas forcément ce compte, et le test est la seule barrière humaine de l'étape — il ne peut pas dépendre d'un identifiant. Le panneau d'histoires peut les grouper par parcours."
+        },
+        {
+          "titre": "FAIRE TESTER le mockup au client et corriger en direct — seule barrière humaine de l'étape",
+          "par": "le client avec toi, puis l'agent",
+          "detail": "Le client parcourt écran par écran, tu rapportes ses remarques, on corrige et on republie au même lien dans la foulée. Autant de tours que nécessaire. `validation.md` daté clôt le passage — postérieur au mockup ET aux histoires."
+        },
+        {
+          "titre": "Appliquer la pile STANDARD et documenter son application à ce projet",
+          "par": "l'agent, sans dialogue",
+          "detail": "La pile ne se rechoisit pas : **React + Vite (TS), Supabase (Postgres/Auth/Storage/RLS), Vercel, Vitest + Playwright**. `stack-decisions.md` documente COMMENT ce standard s'applique ici — schéma de données, tables et politiques RLS, buckets, ce qui est déployé où — et les ÉCARTS éventuels, chacun avec le fait d'usage qui l'impose (un écart ne se justifie que si le standard rend le produit impossible, jamais par préférence). Les questions différées au cadrage que le standard ne tranche pas reçoivent leur réponse dans le même fichier."
+        },
+        {
+          "titre": "Compléter les histoires et établir la couverture UI totale",
+          "par": "l'agent",
+          "detail": "Cas limites, paires, accessibilité, critères ÉTANT DONNÉ/QUAND/ALORS. Aucune histoire v1 ne disparaît. `ui-coverage.json` : chaque élément dessiné est raconté. Chaque histoire citée par un parcours existe dans `stories.json`."
+        },
+        {
+          "titre": "Produire architecture, feuille de route, kit de projet et tests",
+          "par": "l'agent",
+          "detail": "`system-architecture.html`, `roadmap.html` (3-6 jalons tous démontrables), spec/plan/tasks/rules, plans de cas d'usage et échafaudage Playwright."
+        },
+        {
+          "titre": "Contrôler le pré-vol : jalons démontrables, parcours couverts, cas d'usage, dépôt, déploiement",
+          "par": "l'agent",
+          "detail": "Contrôle sur pièces et CORRECTION : un jalon non démontrable fusionne (motif écrit), un plan de cas d'usage manquant s'écrit, une étape de parcours sans écran ou sans histoire se complète. `roadmap-approved.json` acte le pré-vol."
+        }
+      ],
+      "livrables": [
+        "docs/pipeline/concept.md",
+        "docs/pipeline/questions-techniques.md",
+        "docs/pipeline/cahier-des-charges.md",
+        "docs/pipeline/parcours-utilisateur.json",
+        "docs/pipeline/parcours-utilisateur.md",
+        "docs/pipeline/design/mockup-url.txt",
+        "docs/pipeline/design/mockup-public-url.txt",
+        "docs/pipeline/design/screens.json",
+        "docs/pipeline/design/stories-v1.json",
+        "docs/pipeline/design/validation.md",
+        "docs/pipeline/stack-decisions.md",
+        "docs/pipeline/stories.json",
+        "docs/pipeline/ui-coverage.json",
+        "docs/pipeline/roadmap.html",
+        "docs/pipeline/spec.md",
+        "docs/pipeline/plan.md",
+        "docs/pipeline/tasks.md",
+        "docs/pipeline/rules.md",
+        "docs/pipeline/roadmap-approved.json"
+      ],
+      "juge": {
+        "type": "presence"
+      },
+      "gate": {
+        "validateur": "webapp-concevoir"
+      },
+      "suivant": [],
+      "commande_locale": "/webapp-start   (ou : flux-local webapp concevoir, puis --push)",
+      "note_locale": "Étape jouée seule : à la banderole de fin, le design est livré. Il n'y a pas de nœud suivant dans ce flux — la construction se mène ailleurs.",
+      "agents": [
+        {
+          "role": "Le concepteur",
+          "competence": "mène la conception en conversation avec le client, dessine, puis spécifie seul jusqu'au kit vérifié",
+          "outils": [
+            "dialogue avec l'opérateur — A/B/C + quatrième option ouverte toujours ÉCRITE parmi les choix, une question à la fois, jamais à blanc",
+            "squelette et mockup publiés — Artifact (republiés au même chemin, donc même URL)",
+            "lecture-écriture du workspace — Read/Write/Edit/Glob/Grep",
+            "recherche en ligne — WebSearch/WebFetch (contraintes réelles avant de trancher la pile)",
+            "shell / terminal — Bash (arborescence, dépôt distant, pré-vol)"
+          ],
+          "consignes": [
+            {
+              "nom": "webapp-start",
+              "role": "le point d'entrée : run résolue, workspace rapatrié, brief et protocoles chargés"
+            },
+            {
+              "nom": "pipeline-step1",
+              "role": "cadrage, cahier des charges, parcours utilisateur, histoires v1, mockup dual-layer, test du client"
+            },
+            {
+              "nom": "pipeline-step2",
+              "role": "pile appliquée, histoires complétées depuis le parcours, couverture UI, kit de projet, tests"
+            },
+            {
+              "nom": "pipeline-step3",
+              "role": "pré-vol : kit vérifié, parcours couverts, jalons démontrables, dépôt, déploiement"
+            }
+          ],
+          "contexte": "~180k"
+        }
+      ],
+      "banderole": "FIN DE L'ÉTAPE 1 — CONCEVOIR"
+    }
+  ]
+}
