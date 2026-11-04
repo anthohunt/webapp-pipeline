@@ -1,4 +1,6 @@
-# Pipeline web app en 3 étapes — contrat entre le graphe, le tournage et le module (24/10/2026)
+# Three-stage web app pipeline: contract between the graph, the filming and the module (24 October 2026)
+
+> This document is in French.
 
 Design : `docs/2026-10-24-webapp-3-etapes-design.md`. Ce fichier fixe ce que chaque morceau lit et écrit,
 pour que le graphe (`workflows/webapp.json` + skills `pipeline-step*`), le tournage automatique

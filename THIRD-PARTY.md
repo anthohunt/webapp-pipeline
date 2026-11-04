@@ -1,23 +1,23 @@
-# Dépendances tierces
+# Third-party dependencies
 
-Ce dépôt ne redistribue aucune bibliothèque tierce. Les composants ci-dessous sont installés à part, par
-l'utilisateur, quand il en a besoin.
+This repository redistributes no third-party library. The components below are installed separately by the user, when
+needed.
 
-| Composant | Rôle | Licence | Obligatoire |
+| Component | Role | License | Required |
 |---|---|---|---|
-| flux (moteur de pipelines, dépôt séparé du même auteur) | joue les graphes, lance les agents, passe les contrôles | Apache 2.0 | oui |
-| Python 3.10+ (bibliothèque standard) | outils, contrôles, programme du module | PSF | oui |
-| jsonschema | vérification des graphes par le moteur flux | MIT | oui (via flux) |
-| tmux | sessions détachées du lanceur de l'étape 2 | ISC | pour lancer des agents |
-| Claude Code (Anthropic) | les agents ; le module `mod/` est un mod de Claude Code | conditions d'Anthropic (non libre) | pour lancer des agents |
-| PyYAML | tournage de la vidéo (`tools/webapp-tourner.py`) | MIT | non (vidéo) |
-| edge-tts | voix de synthèse de la vidéo | LGPL 3.0 | non (vidéo) |
-| playwright-core, Chromium de Playwright | relevé des pages (`tools/webapp-sonde.mjs`), tests des applis construites | Apache 2.0 | non |
-| Outil de tournage (mod « tournage ») | filmer et monter la vidéo de démonstration | non fourni | non (vidéo) |
+| flux (pipeline engine, separate repository by the same author) | plays the graphs, starts the agents, runs the checks | Apache 2.0 | yes |
+| Python 3.10+ (standard library) | tools, checks, module program | PSF | yes |
+| jsonschema | graph validation by the flux engine | MIT | yes (through flux) |
+| tmux | detached sessions of the stage 2 launcher | ISC | to run agents |
+| Claude Code (Anthropic) | the agents; the `mod/` module is a Claude Code mod | Anthropic's terms (not open source) | to run agents |
+| PyYAML | video filming (`tools/webapp-tourner.py`) | MIT | no (video) |
+| edge-tts | synthetic voice for the video | LGPL 3.0 | no (video) |
+| playwright-core, Playwright's Chromium | page capture (`tools/webapp-sonde.mjs`), tests of the built apps | Apache 2.0 | no |
+| Filming tool ("tournage" mod) | filming and editing the demo video | not provided | no (video) |
 
-Les applications que la pipeline construit utilisent par défaut React, Vite, Supabase (client), Playwright et
-Vitest (licences MIT ou Apache 2.0), installés dans chaque application, jamais dans ce dépôt. Leur hébergement
-(Supabase, Vercel) passe par les comptes de l'utilisateur.
+The applications the pipeline builds use React, Vite, Supabase (client), Playwright and Vitest by default (MIT or
+Apache 2.0 licenses), installed in each application, never in this repository. Their hosting (Supabase, Vercel) goes
+through the user's accounts.
 
-Toutes ces licences sont compatibles avec la licence Apache 2.0 du code de ce dépôt : rien n'est recopié ni lié
-statiquement ; edge-tts (LGPL) n'est qu'importé, à l'exécution, par un outil facultatif.
+All these licenses are compatible with the Apache 2.0 license of the code in this repository: nothing is copied or
+statically linked; edge-tts (LGPL) is only imported, at run time, by an optional tool.

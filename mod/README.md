@@ -1,4 +1,6 @@
-# Web app — module Claude Code
+# Web app: Claude Code module
+
+> This document is in French.
 
 Conduit une run de la pipeline web app en 3 étapes, du pitch au « good » du client (design :
 `docs/2026-10-24-webapp-3-etapes-design.md` ; fichiers et commandes : `docs/2026-10-24-webapp-3-etapes-contrat.md`,

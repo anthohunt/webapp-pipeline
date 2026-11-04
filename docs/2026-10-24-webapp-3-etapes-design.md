@@ -1,4 +1,6 @@
-# Pipeline web app en 3 étapes — design (24/10/2026)
+# Three-stage web app pipeline: design (24 October 2026)
+
+> This document is in French.
 
 Design validé le 24/10/2026.
 
