@@ -1,6 +1,8 @@
 [English](README.md) · **Français**
 
-# webapp-pipeline
+**Anthony Hunt** · [Fiche du projet sur ingevision.cloud](https://ingevision.cloud/?p=pipeline) · [LinkedIn](https://www.linkedin.com/in/anthony-hunt-3948a9196) · [Profil GitHub](https://github.com/anthohunt)
+
+# Web App Pipeline
 
 Une pipeline d'agents en trois étapes qui transforme l'idée d'un client en application web en ligne.
 
